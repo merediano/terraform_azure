@@ -1,25 +1,35 @@
-# Create the resource group
-resource "azurerm_resource_group" "main" {
-  name     = "terraform-course"
-  location = var.location
+# Get information about available locations
+data "azurerm_subscription" "current" {}
+
+data "azurerm_client_config" "current" {}
+
+# Get location information
+data "azurerm_location" "current" {
+  location = "eastus"
+}
+
+# Create Resource Group using data source information
+resource "azurerm_resource_group" "development" {
+  name     = "development-resources"
+  location = data.azurerm_location.current.display_name
 
   tags = {
-    Name        = "terraform-course"
-    Environment = var.environment
-    Managed_By  = "Terraform"
+    Environment = "development"
+    Subscription = data.azurerm_subscription.current.display_name
+    CreatedBy    = data.azurerm_client_config.current.object_id
   }
 }
 
-# Create the virtual network
-resource "azurerm_virtual_network" "main" {
-  name                = "terraform-network"
-  resource_group_name = azurerm_resource_group.main.name
-  location            = azurerm_resource_group.main.location
-  address_space       = var.vnet_address_space
+# Create Virtual Network using data source information
+resource "azurerm_virtual_network" "development" {
+  name                = "development-network"
+  resource_group_name = azurerm_resource_group.development.name
+  location            = azurerm_resource_group.development.location
+  address_space       = [var.vnet_cidr]
 
   tags = {
-    Name        = "terraform-course"
-    Environment = var.environment
-    Managed_By  = "Terraform"
+    Environment  = "development"
+    Location     = data.azurerm_location.current.display_name
+    CreatedBy    = "${data.azurerm_subscription.current.subscription_id}-${data.azurerm_location.current.display_name}"
   }
 }

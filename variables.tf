@@ -1,17 +1,5 @@
-variable "vnet_address_space" {
-  description = "Address space for Virtual Network"
-  type        = list(string)
-  default     = ["192.168.0.0/16"]
-}
-
-variable "environment" {
-  description = "Environment name for tagging"
+variable "vnet_cidr" {
+  description = "CIDR block for development VNet"
   type        = string
-  default     = "learning-terraform"
-}
-
-variable "location" {
-  description = "Azure region for resources"
-  type        = string
-  default     = "canadacentral"
+  default     = "172.16.0.0/16"
 }
